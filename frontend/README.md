@@ -1,44 +1,59 @@
 # OKRio Frontend
 
-This directory documents the plan for the React + TypeScript single-page application that powers the OKRio user experience.
+Enterprise-grade OKR management interface built with React 18, TypeScript and Vite. The project follows the Feature-Sliced Design methodology and includes localisation, drag-and-drop alignment tooling, analytics dashboards and Progressive Web App capabilities.
 
-## Technology stack
+## Getting started
 
-- React 18 with TypeScript and Vite as the build tool.
-- Feature-Sliced Design (layers: `app`, `processes`, `pages`, `features`, `entities`, `shared`).
-- Redux Toolkit with RTK Query for state management and data fetching.
-- Chakra UI component library with custom theming (light/dark/brand palettes) and accessibility compliance (WCAG 2.1 AA).
-- React Router for navigation, React-i18next for localisation (RU/EN baseline).
-- Testing stack: Jest + React Testing Library for unit/component, Cypress for E2E, Storybook for UI documentation.
-- PWA capabilities: service worker, offline cache, push notifications.
-
-## Project structure
-
-```
-frontend/
-├── README.md
-├── package.json        # Defined in subsequent iterations when implementation begins
-├── tsconfig.json       # Ditto
-└── src/
-    └── app/
-        ├── providers/  # App-level contexts (store, theme, i18n)
-        └── router/     # Route definitions and guards
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-Initial implementation will add reusable UI primitives (`shared`), entity slices (OKR, Objective, KeyResult, Workspace), feature-level widgets (alignment tree, check-in flow), and page compositions (dashboard, workspace OKR, settings, analytics).
+Key scripts:
 
-## Key UX capabilities
+- `npm run dev` — start the Vite development server with hot module replacement.
+- `npm run build` — generate a production build.
+- `npm run preview` — preview the production build locally.
 
-- Alignment explorer with heatmap, drag-and-drop realignment, inline editing, and template selection.
-- Workflow modals for OKR drafting, expert review, manager approval, and closure, backed by real-time collaboration via WebSocket updates.
-- Check-in cadence management with reminders, 1:1 agenda builder, pulse surveys, and engagement scoring visualisations.
-- Analytics dashboards with configurable widgets, drill-down, forecast visualisations, and exports.
-- Notification centre with delivery preferences and quiet hours configuration.
+## Architecture
 
-## Next steps
+The codebase is organised according to Feature-Sliced Design layers:
 
-1. Bootstrap Vite + React + TypeScript project with Chakra UI and Redux Toolkit.
-2. Implement authentication flow against Azure AD (MSAL.js) and bootstrap user session management.
-3. Establish RTK Query base API client (REST + WebSocket streaming) with optimistic updates and caching policies.
-4. Build core pages (Home dashboard, Workspace OKR, Alignment map, Settings) and reusable components (data tables, tree explorer, forms).
-5. Integrate localisation, accessibility testing, and performance budgets (bundle splitting, Suspense, list virtualisation).
+```
+src/
+├── app/            # Application shell, router and providers
+├── entities/       # Domain entities (OKR tree, etc.)
+├── features/       # User-facing features (alignment board, language switcher)
+├── pages/          # Composed pages (dashboard, workspace, analytics)
+├── processes/      # Cross-page processes (check-ins, workflows)
+├── shared/         # Reusable configuration, UI primitives and helpers
+└── widgets/        # Composite widgets (analytics dashboards)
+```
+
+### Internationalisation
+
+Localisation is powered by `react-i18next` with automatic language detection (English/Russian). Strings live in `src/shared/config/i18n.ts` and can be extended per namespace.
+
+### Drag-and-drop alignment
+
+The alignment board leverages `@dnd-kit/core` to support rearranging objectives inside the OKR tree. Drops are persisted in Redux Toolkit state so the UI reflects hierarchy changes instantly.
+
+### Analytics dashboards
+
+Reusable dashboard widgets are provided in `src/widgets/analytics-dashboard` using Recharts. They visualise execution velocity, completion rates and engagement scores with Chakra UI theming.
+
+### PWA support
+
+`vite-plugin-pwa` delivers offline caching, manifest generation and automatic service worker updates. The entrypoint registers the service worker via `virtual:pwa-register`. To keep the repository text-only, the manifest ships an SVG icon (`public/favicon.svg`); replace it with PNG assets if your deployment requires bitmap icons.
+
+## Tech stack
+
+- React 18 + TypeScript + Vite
+- Chakra UI design system
+- Redux Toolkit for state management
+- React Router v6
+- `react-i18next` for localisation
+- `@dnd-kit` for drag-and-drop interactions
+- Recharts for analytical visualisations
+- `vite-plugin-pwa` for Progressive Web App capabilities
