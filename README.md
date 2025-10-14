@@ -9,6 +9,17 @@ OKRio — корпоративная OKR-платформа уровня enterpr
 - `docs/architecture.md` — архитектурный blueprint, агрегирующий требования по функциональности, интеграциям, безопасности и DevOps.
 - `.env.example` — список обязательных переменных окружения (Azure OAuth, PostgreSQL, Redis и локальное файловое хранилище).
 
+## Быстрый старт через Docker Compose
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Команда поднимет API, Celery worker/beat, PostgreSQL, Redis и RabbitMQ. После успешного запуска
+backend будет доступен на http://localhost:8000. Для разработки фронтенда можно запустить `npm run dev`
+в каталоге `frontend/` или собрать продакшн-версию через `npm run build`.
+
 ## Запуск backend-сервиса локально
 
 ```bash

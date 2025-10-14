@@ -66,8 +66,8 @@ class InMemoryDirectory:
                 userName=payload.userName,
                 active=payload.active,
                 displayName=payload.displayName,
-                name=payload.name.dict() if payload.name else None,
-                emails=[email.dict() for email in payload.emails],
+                name=payload.name.model_dump() if payload.name else None,
+                emails=[email.model_dump() for email in payload.emails],
                 externalId=payload.externalId,
             )
             self._users[user_id] = user
@@ -91,8 +91,8 @@ class InMemoryDirectory:
                 userName=payload.userName,
                 active=payload.active,
                 displayName=payload.displayName,
-                name=payload.name.dict() if payload.name else None,
-                emails=[email.dict() for email in payload.emails],
+                name=payload.name.model_dump() if payload.name else None,
+                emails=[email.model_dump() for email in payload.emails],
                 externalId=payload.externalId,
             )
             self._users[user_id] = user
