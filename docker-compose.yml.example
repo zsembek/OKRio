@@ -3,7 +3,7 @@ version: "3.9"
 services:
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.example
     env_file:
       - .env
@@ -20,7 +20,7 @@ services:
 
   celery_worker:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.example
     env_file:
       - .env
@@ -33,7 +33,7 @@ services:
 
   celery_beat:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.example
     env_file:
       - .env
