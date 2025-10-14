@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "okrio-backend"
+version = "0.1.0"
+description = "Enterprise OKR platform backend"
+authors = ["OKRio Team <dev@okrio.example>"]
+packages = [
+    { include = "app", from = "app" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+pydantic = "^1.10.0"
+uvicorn = { extras = ["standard"], version = "^0.29.0" }
+sqlalchemy = "^2.0.0"
+psycopg2-binary = "^2.9.0"
+redis = "^5.0.0"
+celery = "^5.3.0"
+python-multipart = "^0.0.6"
+pydantic = "^1.10.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.0"
+isort = "^5.13"
+pytest = "^7.4"
+pytest-asyncio = "^0.23"
+mypy = "^1.8"
+
+[build-system]
+requires = ["poetry-core>=1.5.0"]
+build-backend = "poetry.core.masonry.api"
