@@ -32,7 +32,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Команда поднимет API, Celery worker/beat, PostgreSQL, Redis и RabbitMQ. После успешного запуска backend доступен на http://localhost:8000. Для разработки фронтенда перейдите в каталог `frontend/` и выполните `npm run dev` или соберите продакшн-версию через `npm run build`.
+Команда поднимет API, Celery worker/beat, PostgreSQL, Redis и RabbitMQ. После успешного запуска backend доступен на http://localhost:8070. Для разработки фронтенда перейдите в каталог `frontend/` и выполните `npm run dev` или соберите продакшн-версию через `npm run build`.
 
 ## Локальный запуск компонентов
 

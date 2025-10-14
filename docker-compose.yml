@@ -7,9 +7,9 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8070
     ports:
-      - "8000:8000"
+      - "8070:8070"
     depends_on:
       postgres:
         condition: service_healthy
@@ -50,12 +50,12 @@ services:
       POSTGRES_DB: okrio
       POSTGRES_USER: okrio
       POSTGRES_PASSWORD: okrio
-    ports:
-      - "5432:5432"
+      PGPORT: 5439
+    command: ["postgres", "-c", "port=5439"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U okrio"]
+      test: ["CMD-SHELL", "pg_isready -U okrio -p 5439"]
       interval: 10s
       timeout: 5s
       retries: 5

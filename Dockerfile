@@ -11,6 +11,7 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY backend/pyproject.toml ./
+COPY backend/poetry.lock ./
 
 RUN pip install --upgrade pip \
     && pip install "poetry>=1.7" \
@@ -21,6 +22,6 @@ COPY backend/app ./app
 
 ENV PYTHONPATH=/app
 
-EXPOSE 8000
+EXPOSE 8070
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8070"]
