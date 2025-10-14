@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-okrio}
+      POSTGRES_USER: ${POSTGRES_USER:-okrio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-okrio}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save "" --appendonly no
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.example
+      target: backend
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-okrio}:${POSTGRES_PASSWORD:-okrio}@postgres:5432/${POSTGRES_DB:-okrio}
+      REDIS_URL: redis://redis:6379/0
+      FRONTEND_URL: http://localhost:4173
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.example
+      target: frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://backend:8000
+    ports:
+      - "4173:80"
+
+volumes:
+  postgres_data:

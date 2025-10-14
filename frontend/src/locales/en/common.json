@@ -1,0 +1,7 @@
+{
+  "dashboard": {
+    "title": "Workspace OKRs",
+    "period": "Period",
+    "subtitle": "You are tracking {{count}} active objectives this cycle"
+  }
+}

@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "okrio-backend"
+version = "0.1.0"
+description = "Enterprise OKR platform backend"
+authors = [{ name = "OKRio Team", email = "dev@okrio.example" }]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110,<0.111",
+    "pydantic>=1.10,<2.0",
+    "uvicorn[standard]>=0.29,<0.30",
+    "sqlalchemy>=2.0,<2.1",
+    "psycopg2-binary>=2.9,<2.10",
+    "redis>=5.0,<6.0",
+    "celery>=5.3,<5.4",
+    "python-multipart>=0.0.6,<0.0.7"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.3",
+    "isort>=5.13",
+    "mypy>=1.8",
+    "pytest>=7.4",
+    "pytest-asyncio>=0.23"
+]
+
+[tool.setuptools]
+package-dir = {"" = "app"}
+
+[tool.setuptools.packages.find]
+where = ["app"]
