@@ -16,6 +16,18 @@ This directory hosts the FastAPI-based monolith that powers the OKRio enterprise
 - **Workflow engine** capturing the multi-stage OKR approval lifecycle with RBAC/ABAC enforcement and object-role overrides.
 - **Shared schemas** (e.g., health endpoints) to encourage consistency across routers.
 
+## Key modules
+
+- `app/core/config.py` — typed settings loader with `.env` support and Azure validation logic.
+- `app/core/database.py` — SQLAlchemy engine + scoped session helpers used by repositories and journaling services.
+- `app/models/__init__.py` — доменные модели и политики RLS (тенанты, рабочие пространства, пользователи, OKR, вложения).
+- `app/services/access_policies.py` — RBAC/ABAC движок, применяемый в auth API и workflow.
+- `app/services/file_storage.py` — локальное файловое хранилище с защитой от path traversal.
+- `app/modules/auth` — OAuth 2.0 клиенты, SCIM каталог и API для управления доступом.
+- `app/modules/workflow` — in-memory workflow engine + REST API для стадий согласования.
+- `app/modules/data_connectors` — базовые классы, журнал выборок и реализации коннекторов Microsoft Graph Excel и PostgreSQL RO.
+- `app/core/celery_app.py` — Celery фабрика, регистрирующая задачи модулей.
+
 ## Local development
 
 ```bash
@@ -42,9 +54,15 @@ poetry run alembic upgrade head  # применить миграции
 poetry run alembic revision --autogenerate -m "описание"  # создать новую миграцию
 ```
 
+## Testing
+
+```bash
+poetry run pytest
+```
+
 ## Next steps
 
-- Implement domain models (SQLAlchemy) and Alembic migrations with row-level security policies.
-- Flesh out API endpoints, workflow logic, and data connector adapters (Excel via Microsoft Graph, PostgreSQL read-only bindings).
-- Integrate authentication with Azure AD (OAuth2 Authorization Code + PKCE) and build SCIM provisioning endpoints.
-- Expand unit, integration, and contract tests alongside linters configured in CI/CD pipelines.
+- Expand REST API endpoints beyond health checks, persist workflow state and connector bindings in the database.
+- Implement authentication/session management on top of the Azure OAuth flows and connect RBAC/ABAC to persisted assignments.
+- Harden data connector error handling with integration tests and production-ready observability (metrics, logging, tracing).
+- Wire CI/CD automation (linting, static typing, tests, Docker builds) and security controls (rate limiting, audit trail, secrets rotation).

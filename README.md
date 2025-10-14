@@ -1,13 +1,29 @@
 # OKRio
 
-OKRio — корпоративная OKR-платформа уровня enterprise. Репозиторий содержит исходный код и документацию по реализации системы на стеке Python FastAPI + React.
+OKRio — корпоративная OKR-платформа уровня enterprise. Репозиторий включает рабочий backend на FastAPI и фронтенд на React + TypeScript, а также архитектурную документацию, описывающую требования платформы.
 
 ## Структура репозитория
 
-- `backend/` — заготовка монолита FastAPI с модульной организацией доменов (Auth, Accounts, Org, OKR, Workflow, Analytics, Notifications, Integrations, Data Connectors), конфигурацией окружения, базовыми роутерами и Celery.
-- `frontend/` — план реализации SPA на React + TypeScript с Feature-Sliced Design и UX-требованиями.
-- `docs/architecture.md` — архитектурный blueprint, агрегирующий требования по функциональности, интеграциям, безопасности и DevOps.
-- `.env.example` — список обязательных переменных окружения (Azure OAuth, PostgreSQL, Redis и локальное файловое хранилище).
+- `backend/` — монолит FastAPI с модульной организацией доменов (Auth, Accounts, Org, OKR, Workflow, Analytics, Notifications, Integrations, Data Connectors), конфигурацией окружения на Pydantic `BaseSettings`, Celery и сервисами уровня enterprise (RBAC/ABAC движок, workflow-оркестратор, локальное файловое хранилище, коннекторы данных, SCIM-хендлеры).
+- `frontend/` — SPA на React 18 + TypeScript, собранная по принципам Feature-Sliced Design и оснащенная i18n, drag-and-drop выравниванием целей, аналитическими дашбордами и PWA-конфигурацией.
+- `docs/architecture.md` — архитектурный blueprint, агрегирующий функциональные, интеграционные, безопасностные и DevOps-требования.
+- `.env.example` — перечень обязательных переменных окружения (Azure OAuth, PostgreSQL, Redis, RabbitMQ и локальное файловое хранилище).
+
+## Реализованный функционал
+
+### Backend
+
+- Доменные модели (тенанты, рабочие пространства, пользователи, OKR) с политиками PostgreSQL RLS и миграциями Alembic.
+- Конфигурация окружения с валидацией Azure AD OAuth и Microsoft Graph, а также фабрика Celery, подключающая рабочие очереди (Redis/RabbitMQ).
+- RBAC + ABAC + object roles через `AccessPolicyEngine`, используемый в auth-роутерах и workflow-сервисе.
+- Интеграция с Azure AD: OAuth 2.0 Authorization Code + PKCE, refresh/logout хелперы и in-memory SCIM 2.0 каталог.
+- Workflow-движок, управляемый политиками доступа, и коннекторы данных (Microsoft Graph Excel, PostgreSQL read-only) с журналом выборок и fail-safe режимом.
+
+### Frontend
+
+- Feature-Sliced структура директорий (app, entities, features, pages, processes, shared, widgets).
+- Поддержка i18n (EN/RU), Redux Toolkit для состояния, Chakra UI для темизации и drag-and-drop выравнивание OKR через `@dnd-kit`.
+- Аналитические дашборды на Recharts и сервис-воркер через `vite-plugin-pwa`.
 
 ## Быстрый старт через Docker Compose
 
@@ -16,11 +32,11 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Команда поднимет API, Celery worker/beat, PostgreSQL, Redis и RabbitMQ. После успешного запуска
-backend будет доступен на http://localhost:8000. Для разработки фронтенда можно запустить `npm run dev`
-в каталоге `frontend/` или собрать продакшн-версию через `npm run build`.
+Команда поднимет API, Celery worker/beat, PostgreSQL, Redis и RabbitMQ. После успешного запуска backend доступен на http://localhost:8000. Для разработки фронтенда перейдите в каталог `frontend/` и выполните `npm run dev` или соберите продакшн-версию через `npm run build`.
 
-## Запуск backend-сервиса локально
+## Локальный запуск компонентов
+
+### Backend
 
 ```bash
 cd backend
@@ -35,10 +51,32 @@ poetry run celery -A app.core.celery_app.celery_app worker -l info
 poetry run celery -A app.core.celery_app.celery_app beat -l info
 ```
 
+Тесты:
+
+```bash
+poetry run pytest
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Сборка и предпросмотр:
+
+```bash
+npm run build
+npm run preview
+```
+
 ## Дальнейшие шаги
 
 1. ✅ Реализовать доменные модели (SQLAlchemy) с политиками RLS и миграциями Alembic.
-2. ⬜ Подключить Azure AD OAuth 2.0 / SCIM, построить RBAC+ABAC+object roles, реализовать workflow согласований.
-3. ⬜ Реализовать коннекторы данных (Microsoft Graph Excel, PostgreSQL read-only) с журналом выборок и fail-safe.
-4. ⬜ Собрать фронтенд (Vite + React) с Feature-Sliced архитектурой, i18n, drag-and-drop, аналитическими дашбордами и PWA.
+2. ✅ Подключить Azure AD OAuth 2.0 / SCIM, построить RBAC+ABAC+object roles и workflow согласований.
+3. ✅ Реализовать коннекторы данных (Microsoft Graph Excel, PostgreSQL read-only) с журналом выборок и fail-safe.
+4. ✅ Собрать фронтенд (Vite + React) с Feature-Sliced архитектурой, i18n, drag-and-drop, аналитическими дашбордами и PWA.
 5. ⬜ Настроить CI/CD (GitHub Actions → ArgoCD), IaC (Terraform), observability (Prometheus/Grafana, OpenTelemetry), безопасность (rate limiting, audit trail, шифрование).
+
