@@ -1,15 +1,18 @@
 """Application configuration utilities."""
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
-from pydantic import AnyHttpUrl, BaseSettings, Field, root_validator, validator
+from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
-class Settings(BaseSettings):
+class Settings(BaseModel):
     """Runtime configuration sourced from environment variables."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
     project_name: str = Field("OKRio", description="Human readable project name")
     environment: str = Field("development", description="Deployment environment name")
@@ -44,18 +47,13 @@ class Settings(BaseSettings):
 
     rabbitmq_url: str | None = Field(None, alias="RABBITMQ_URL")
 
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
-    @validator("cors_origins", pre=True)
+    @field_validator("cors_origins", mode="before")
     def split_cors_origins(cls, value: str | List[str]) -> List[AnyHttpUrl]:
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
 
-    @validator("storage_root", pre=True)
+    @field_validator("storage_root", mode="before")
     def expand_storage_root(cls, value: str | Path) -> Path:
         path = Path(value).expanduser()
         base_dir = Path(__file__).resolve().parents[2]
@@ -63,13 +61,13 @@ class Settings(BaseSettings):
             path = base_dir / path
         return path.resolve()
 
-    @root_validator
-    def validate_azure_settings(cls, values: dict[str, object]) -> dict[str, object]:
+    @model_validator(mode="after")
+    def validate_azure_settings(cls, values: "Settings") -> "Settings":
         """Ensure that Azure OAuth configuration is complete."""
 
-        client_secret = values.get("azure_client_secret")
-        frontend_redirect = values.get("azure_redirect_uri_frontend")
-        backend_redirect = values.get("azure_redirect_uri_backend")
+        client_secret = values.azure_client_secret
+        frontend_redirect = values.azure_redirect_uri_frontend
+        backend_redirect = values.azure_redirect_uri_backend
 
         if not frontend_redirect:
             raise ValueError("AZURE_REDIRECT_URI_FRONTEND must be provided")
@@ -86,9 +84,40 @@ class Settings(BaseSettings):
 
         return values
 
+    @classmethod
+    def _load_env_file(cls, path: Path) -> Dict[str, str]:
+        data: Dict[str, str] = {}
+        if not path.exists():
+            return data
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            data[key.strip()] = value.strip().strip('"').strip("'")
+        return data
+
+    @classmethod
+    def load(cls) -> "Settings":
+        """Instantiate settings from environment variables and optional .env file."""
+
+        base_dir = Path(__file__).resolve().parents[2]
+        env_file_values = cls._load_env_file(base_dir / ".env")
+        combined_env: Dict[str, str] = {**env_file_values, **os.environ}
+
+        init_values: Dict[str, object] = {}
+        for field_name, field in cls.model_fields.items():
+            alias = field.alias or field_name
+            if alias in combined_env:
+                init_values[field_name] = combined_env[alias]
+
+        return cls(**init_values)
+
 
 @lru_cache
 def get_settings() -> Settings:
     """Return memoized settings instance."""
 
-    return Settings()
+    return Settings.load()
