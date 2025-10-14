@@ -11,6 +11,8 @@ This directory hosts the FastAPI-based monolith that powers the OKRio enterprise
 - **Local file storage service** обеспечивающий безопасную работу с вложениями на файловой системе сервера (без S3).
 - **Celery application** preconfigured to use Redis or RabbitMQ as broker and Redis as result backend. Domain task modules are registered for asynchronous workloads such as notifications, analytics computations, and connector refreshes.
 - **Access policy helpers** that codify the RBAC + ABAC rules described in the specification and can be extended to enforce row-level security and object roles.
+- **Azure AD integration** with helpers for OAuth 2.0 Authorization Code + PKCE flows, refresh, and logout plus in-memory SCIM 2.0 provisioning endpoints for users and groups.
+- **Workflow engine** capturing the multi-stage OKR approval lifecycle with RBAC/ABAC enforcement and object-role overrides.
 - **Shared schemas** (e.g., health endpoints) to encourage consistency across routers.
 
 ## Local development
