@@ -36,6 +36,15 @@ poetry install
 poetry run uvicorn app.main:app --reload
 ```
 
+> ℹ️ **Poetry vs. pip**
+>
+> The Docker images now install backend dependencies from the pinned
+> `requirements.locked.txt` snapshot to avoid resolver issues with
+> newer `httpx` releases. If you prefer using Poetry locally, run
+> `poetry lock` first (so the lock file picks up `httpx>=0.28`) or
+> install the same set manually via `pip install -r requirements.locked.txt`
+> inside a virtual environment.
+
 Celery worker example:
 
 ```bash
