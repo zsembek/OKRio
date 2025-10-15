@@ -1,6 +1,6 @@
 # Запуск OKRio в Docker Compose
 
-Эта инструкция поможет поднять полный стек (backend, Celery, PostgreSQL, Redis и RabbitMQ) локально при помощи Docker Compose.
+Эта инструкция поможет поднять полный стек (frontend, backend, Celery, PostgreSQL, Redis и RabbitMQ) локально при помощи Docker Compose.
 
 ## 1. Подготовьте окружение
 
@@ -43,13 +43,14 @@ docker compose up --build
 ```
 
 - Флаг `--build` гарантирует пересборку backend-образа при первом запуске или после изменения кода.
-- Docker Compose автоматически поднимет сервисы `backend`, `celery_worker`, `celery_beat`, `postgres`, `redis` и `rabbitmq`. База данных `postgres` снабжена healthcheck’ом, поэтому backend стартует только после готовности БД.
+- Docker Compose автоматически поднимет сервисы `frontend`, `backend`, `celery_worker`, `celery_beat`, `postgres`, `redis` и `rabbitmq`. База данных `postgres` снабжена healthcheck’ом, поэтому backend стартует только после готовности БД.
 - Для остановки сервисов нажмите `Ctrl+C`. Чтобы удалить контейнеры, выполните `docker compose down`, а для очистки данных PostgreSQL добавьте `-v`.
 
 ## 5. Проверка доступности
 
 После успешного запуска сервисы доступны по следующим адресам:
 
+- Frontend (Vite dev server): http://localhost:5173
 - Backend FastAPI: http://localhost:8070
 - Redis: localhost:6379
 - RabbitMQ (AMQP): localhost:5672
