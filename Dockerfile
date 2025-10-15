@@ -1,3 +1,10 @@
+FROM alpine/git AS fetcher
+
+WORKDIR /src
+
+RUN git clone --branch main --single-branch --depth 1 \
+    https://github.com/zsembek/OKRio.git .
+
 FROM python:3.11-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -10,12 +17,12 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY backend/requirements.locked.txt ./requirements.txt
+COPY --from=fetcher /src/backend/requirements.locked.txt ./requirements.txt
 
 RUN pip install --upgrade pip \
     && pip install --no-compile --no-cache-dir -r requirements.txt
 
-COPY backend/app ./app
+COPY --from=fetcher /src/backend/app ./app
 
 ENV PYTHONPATH=/app
 
