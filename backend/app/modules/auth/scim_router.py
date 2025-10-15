@@ -1,7 +1,7 @@
 """SCIM 2.0 provisioning endpoints."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Response, status
 from fastapi.responses import JSONResponse
 
 from .directory import directory
@@ -59,9 +59,11 @@ def patch_user(user_id: str, payload: SCIMPatchRequest) -> SCIMUser:
 
 
 @scim_router.delete("/Users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: str) -> None:
+def delete_user(user_id: str) -> Response:
     if not directory.delete_user(user_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @scim_router.get("/Groups", response_model=SCIMListResponse)
@@ -92,9 +94,11 @@ def replace_group(group_id: str, payload: SCIMGroupCreateRequest) -> SCIMGroup:
 
 
 @scim_router.delete("/Groups/{group_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_group(group_id: str) -> None:
+def delete_group(group_id: str) -> Response:
     if not directory.delete_group(group_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @scim_router.post("/Groups/{group_id}/members", response_model=SCIMGroup)
