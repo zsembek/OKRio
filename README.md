@@ -34,6 +34,8 @@ docker compose up --build
 
 Команда поднимет фронтенд, API, Celery worker/beat, PostgreSQL, Redis и RabbitMQ. После успешного запуска SPA доступно на http://localhost:5173, а backend — на http://localhost:8070. Если требуется запустить фронтенд вручную, перейдите в каталог `frontend/` и выполните `npm run dev` или соберите продакшн-версию через `npm run build`.
 
+> ℹ️ Dockerfile backend-сервиса автоматически выполняет `git clone` репозитория, поэтому при сборке образа всегда используется свежая версия кода из ветки `main`. Локальные файлы нужны только для `docker-compose.yml` и `.env`.
+
 ## Локальный запуск компонентов
 
 ### Backend
