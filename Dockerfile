@@ -10,13 +10,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY backend/pyproject.toml ./
-COPY backend/poetry.lock ./
+COPY backend/requirements.locked.txt ./requirements.txt
 
 RUN pip install --upgrade pip \
-    && pip install "poetry>=1.7" \
-    && poetry config virtualenvs.create false \
-    && poetry install --only main --no-ansi --no-interaction
+    && pip install --no-compile --no-cache-dir -r requirements.txt
 
 COPY backend/app ./app
 
